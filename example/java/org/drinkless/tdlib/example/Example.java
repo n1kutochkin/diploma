@@ -52,6 +52,8 @@ public final class Example {
 
     private static final String newLine = System.getProperty("line.separator");
     private static final String commandsLine = "Enter command (gcs - GetChats, gc <chatId> - GetChat, me - GetMe, sm <chatId> <message> - SendMessage, lo - LogOut, q - Quit): ";
+    private static final long FROM_LAST_MESSAGE = 0;
+    private static final int OFFSET_FOR_LAST_MESSAGE = 0;
     private static volatile String currentPrompt = null;
 
     static {
@@ -220,6 +222,21 @@ public final class Example {
                 case "gc":
                     client.send(new TdApi.GetChat(getChatId(commands[1])), defaultHandler);
                     break;
+                case "gch": {
+                    int limit = 5;
+                    boolean onlyLocal = false;
+                    client.send(
+                            new TdApi.GetChatHistory(
+                                    getChatId(commands[1]),
+                                    FROM_LAST_MESSAGE,
+                                    OFFSET_FOR_LAST_MESSAGE,
+                                    limit,
+                                    onlyLocal
+                            ),
+                            defaultHandler
+                    );
+                    break;
+                }
                 case "me":
                     client.send(new TdApi.GetMe(), defaultHandler);
                     break;
@@ -291,7 +308,7 @@ public final class Example {
     private static void sendMessage(long chatId, String message) {
         // initialize reply markup just for testing
         TdApi.InlineKeyboardButton[] row = {new TdApi.InlineKeyboardButton("https://telegram.org?1", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?2", new TdApi.InlineKeyboardButtonTypeUrl()), new TdApi.InlineKeyboardButton("https://telegram.org?3", new TdApi.InlineKeyboardButtonTypeUrl())};
-        TdApi.ReplyMarkup replyMarkup = new TdApi.ReplyMarkupInlineKeyboard(new TdApi.InlineKeyboardButton[][]{row, row, row});
+        TdApi.ReplyMarkup replyMarkup = new TdApi.ReplyMarkupInlineKeyboard(new TdApi.InlineKeyboardButton[][] {row, row, row});
 
         TdApi.InputMessageContent content = new TdApi.InputMessageText(new TdApi.FormattedText(message, null), false, true);
         client.send(new TdApi.SendMessage(chatId, 0, 0, null, replyMarkup, content), defaultHandler);
@@ -332,6 +349,7 @@ public final class Example {
     }
 
     private static class OrderedChat implements Comparable<OrderedChat> {
+
         final long chatId;
         final TdApi.ChatPosition position;
 
@@ -359,6 +377,7 @@ public final class Example {
     }
 
     private static class DefaultHandler implements Client.ResultHandler {
+
         @Override
         public void onResult(TdApi.Object object) {
             print(object.toString());
@@ -366,6 +385,7 @@ public final class Example {
     }
 
     private static class UpdateHandler implements Client.ResultHandler {
+
         @Override
         public void onResult(TdApi.Object object) {
             switch (object.getConstructor()) {
@@ -377,7 +397,7 @@ public final class Example {
                     TdApi.UpdateUser updateUser = (TdApi.UpdateUser) object;
                     users.put(updateUser.user.id, updateUser.user);
                     break;
-                case TdApi.UpdateUserStatus.CONSTRUCTOR:  {
+                case TdApi.UpdateUserStatus.CONSTRUCTOR: {
                     TdApi.UpdateUserStatus updateUserStatus = (TdApi.UpdateUserStatus) object;
                     TdApi.User user = users.get(updateUserStatus.userId);
                     synchronized (user) {
@@ -438,7 +458,7 @@ public final class Example {
                 case TdApi.UpdateChatPosition.CONSTRUCTOR: {
                     TdApi.UpdateChatPosition updateChat = (TdApi.UpdateChatPosition) object;
                     if (updateChat.position.list.getConstructor() != TdApi.ChatListMain.CONSTRUCTOR) {
-                      break;
+                        break;
                     }
 
                     TdApi.Chat chat = chats.get(updateChat.chatId);
@@ -452,7 +472,7 @@ public final class Example {
                         TdApi.ChatPosition[] new_positions = new TdApi.ChatPosition[chat.positions.length + (updateChat.position.order == 0 ? 0 : 1) - (i < chat.positions.length ? 1 : 0)];
                         int pos = 0;
                         if (updateChat.position.order != 0) {
-                          new_positions[pos++] = updateChat.position;
+                            new_positions[pos++] = updateChat.position;
                         }
                         for (int j = 0; j < chat.positions.length; j++) {
                             if (j != i) {
@@ -583,6 +603,7 @@ public final class Example {
     }
 
     private static class AuthorizationRequestHandler implements Client.ResultHandler {
+
         @Override
         public void onResult(TdApi.Object object) {
             switch (object.getConstructor()) {
