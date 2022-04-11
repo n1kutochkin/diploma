@@ -1,0 +1,25 @@
+package org.drinkless.tdlib.retriever;
+
+public enum Flag {
+    MULTIPLE_WEBSITE_LINKS,
+    SINGLE_WEBSITE_LINK,
+    MULTIPLE_CHANNEL_LINKS,
+    SINGLE_CHANNEL_LINK,
+    USER_TELEPHONE,
+    USER_LINK,
+    SUBSCRIBE_ACTION,
+    EARN_ACTION,
+    JUST_DO_ACTION,
+    ACTION,
+    FOR_FREE,
+    ONLY_TODAY,
+    PROMOTION,
+    NEW,
+    GIVE,
+    DISCOUNT,
+    COURSE,
+    WEBINAR,
+    PRICE,
+    CURRENCY_NAME,
+    CURRENCY_SYMBOL;
+}
