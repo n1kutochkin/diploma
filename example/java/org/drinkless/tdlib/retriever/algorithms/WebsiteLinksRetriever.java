@@ -3,20 +3,31 @@ package org.drinkless.tdlib.retriever.algorithms;
 import org.drinkless.tdlib.TdApi;
 import org.drinkless.tdlib.retriever.Applicable;
 import org.drinkless.tdlib.retriever.Flag;
+import org.drinkless.tdlib.retriever.Retriever;
+import org.drinkless.tdlib.retriever.TgTextContentRetrievable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class WebsiteLinksRetriever implements Applicable {
+public class WebsiteLinksRetriever extends Retriever implements Applicable, TgTextContentRetrievable {
 
     private static final String TELEGRAM_DOMAIN = "t.me";
 
+    public WebsiteLinksRetriever(EnumSet<Flag> flags) {
+        super(flags);
+    }
+
+    public WebsiteLinksRetriever() {
+        super();
+    }
+
+
     @Override
-    public EnumSet<Flag> apply(TdApi.FormattedText message, EnumSet<Flag> existingFlags) {
+    public EnumSet<Flag> apply(TdApi.FormattedText content, EnumSet<Flag> existingFlags) {
 
         EnumSet<Flag> newFlags = EnumSet.copyOf(existingFlags);
 
-        TdApi.TextEntity[] entities = message.entities;
+        TdApi.TextEntity[] entities = content.entities;
 
         List<String> urls = Arrays.stream(entities)
                 .filter(x -> x.type instanceof TdApi.TextEntityTypeTextUrl)
@@ -54,5 +65,16 @@ public class WebsiteLinksRetriever implements Applicable {
         });
 
         return newFlags;
+    }
+
+//    @Override
+//    public EnumSet<Flag> apply(TdApi.FormattedText text, EnumSet<Flag> f) {
+//        this.apply(text, f);
+//        return null;
+//    }
+
+    @Override
+    public EnumSet<Flag> apply(TdApi.Message message, EnumSet<Flag> f) {
+        return this.apply(this.retrieve(message), f);
     }
 }

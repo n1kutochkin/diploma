@@ -8,24 +8,40 @@ package org.drinkless.tdlib.example;
 
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
+import org.drinkless.tdlib.retriever.Flag;
+import org.drinkless.tdlib.retriever.TgTextContentRetrievable;
+import org.drinkless.tdlib.retriever.algorithms.ImperativeVerbsRetriever;
+import org.drinkless.tdlib.retriever.algorithms.WebsiteLinksRetriever;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * Example class for TDLib usage from Java.
  */
 public final class Example {
     private static Client client = null;
+    private static final Logger logger = Logger.getLogger(String.valueOf(Example.class));
 
     private static TdApi.AuthorizationState authorizationState = null;
     private static volatile boolean haveAuthorization = false;
@@ -56,12 +72,79 @@ public final class Example {
     private static final int OFFSET_FOR_LAST_MESSAGE = 0;
     private static volatile String currentPrompt = null;
 
+    private static DefaultListModel<SwingChat> model;
+    private static Integer quantityOfChats = 10;
+    private static volatile boolean adFilterIsOn = false;
+
+    private JTextField textField1;
+    private JRadioButton radioButton;
+    private JComboBox comboBox1;
+    private JButton button1;
+    private JList list1;
+    private JPanel panel;
+    private JScrollPane chatsPane;
+    private JScrollPane viewerPane;
+    private JTextArea viewerArea;
+
     static {
         try {
             System.loadLibrary("tdjni");
         } catch (UnsatisfiedLinkError e) {
             e.printStackTrace();
         }
+    }
+
+    public Example() {
+        model = new DefaultListModel<>();
+
+        list1 = new JList();
+        list1.setModel(model);
+
+        chatsPane.setViewportView(list1);
+
+        button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getSwingChatList(quantityOfChats);
+            }
+        });
+        Integer quantity[] = {10, 20, 50};
+
+        comboBox1 = new JComboBox(quantity);
+        comboBox1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox source = (JComboBox)e.getSource();
+                Integer selected = (Integer) source.getSelectedItem();
+                quantityOfChats = selected.intValue();
+            }
+        });
+        radioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adFilterIsOn = radioButton.isSelected();
+            }
+        });
+
+        list1.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    JList list = (JList) e.getSource();
+                    long id = ((SwingChat) list.getSelectedValue()).getChat().id;
+                    client.send(
+                            new TdApi.GetChatHistory(
+                                    id,
+                                    FROM_LAST_MESSAGE,
+                                    -1,
+                                    20,
+                                    false
+                            ),
+                            new SwingUIHandler(viewerArea)
+                    );
+                }
+            }
+        });
     }
 
     private static void print(String str) {
@@ -223,7 +306,7 @@ public final class Example {
                     client.send(new TdApi.GetChat(getChatId(commands[1])), defaultHandler);
                     break;
                 case "gch": {
-                    int limit = 5;
+                    int limit = 1;
                     boolean onlyLocal = false;
                     client.send(
                             new TdApi.GetChatHistory(
@@ -314,7 +397,145 @@ public final class Example {
         client.send(new TdApi.SendMessage(chatId, 0, 0, null, replyMarkup, content), defaultHandler);
     }
 
+    public static void
+    initUI() {
+
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        JRadioButton adsDisableButton = new JRadioButton("Фильтрация рекламы");
+        adsDisableButton.setBounds(499, 487, 168, 23);
+        frame.getContentPane().add(adsDisableButton);
+
+        JTextField keyWordsField = new JTextField();
+        keyWordsField.setBounds(208, 486, 279, 26);
+        frame.getContentPane().add(keyWordsField);
+        keyWordsField.setColumns(10);
+
+        JScrollPane chatsPane = new JScrollPane();
+        chatsPane.setBounds(6, 6, 192, 504);
+        frame.getContentPane().add(chatsPane);
+
+        model = new DefaultListModel();
+
+        JList chatList = new JList();
+        chatList.setModel(model);
+
+        chatsPane.setViewportView(chatList);
+
+        JScrollPane viewerPane = new JScrollPane();
+        viewerPane.setBounds(210, 6, 457, 469);
+        frame.getContentPane().add(viewerPane);
+
+        JTextArea viewer = new JTextArea();
+        viewer.setEditable(false);
+        viewerPane.setViewportView(viewer);
+
+        chatList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    JList list = (JList) e.getSource();
+                    long id = ((SwingChat) list.getSelectedValue()).getChat().id;
+                    client.send(
+                            new TdApi.GetChatHistory(
+                                    id,
+                                    FROM_LAST_MESSAGE,
+                                    OFFSET_FOR_LAST_MESSAGE,
+                                    20,
+                                    false
+                            ),
+                            new SwingUIHandler(viewer)
+                    );
+                }
+            }
+        });
+
+        JLabel lblNewLabel = new JLabel("Ключевые слова");
+        lblNewLabel.setBounds(210, 474, 304, 16);
+        frame.getContentPane().add(lblNewLabel);
+
+        JButton refreshButton = new JButton("Обновить");
+        refreshButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                getSwingChatList(quantityOfChats);
+            }
+        });
+        refreshButton.setBounds(600, 600, 117, 29);
+        frame.getContentPane().add(refreshButton);
+
+        Integer quantity[] = {10, 20, 50};
+
+        JComboBox comboBox = new JComboBox(quantity);
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox source = (JComboBox)e.getSource();
+                Integer selected = (Integer) source.getSelectedItem();
+                quantityOfChats = selected.intValue();
+            }
+        });
+        comboBox.setBounds(400, 424, 189, 27);
+        frame.getContentPane().add(comboBox);
+
+        frame.setVisible(true);
+    }
+
+    public static void getSwingChatList(int limit) {
+        synchronized (mainChatList) {
+            if (!haveFullMainChatList && limit > mainChatList.size()) {
+                // send LoadChats request if there are some unknown chats and have not enough known chats
+                client.send(new TdApi.LoadChats(new TdApi.ChatListMain(), limit - mainChatList.size()), new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.Object object) {
+                        switch (object.getConstructor()) {
+                            case TdApi.Error.CONSTRUCTOR:
+                                if (((TdApi.Error) object).code == 404) {
+                                    synchronized (mainChatList) {
+                                        haveFullMainChatList = true;
+                                    }
+                                } else {
+                                    System.err.println("Receive an error for LoadChats:" + newLine + object);
+                                }
+                                break;
+                            case TdApi.Ok.CONSTRUCTOR:
+                                // chats had already been received through updates, let's retry request
+                                getSwingChatList(limit);
+                                break;
+                            default:
+                                System.err.println("Receive wrong response from TDLib:" + newLine + object);
+                        }
+                    }
+                });
+                return;
+            }
+        }
+
+        if (!model.isEmpty()) {
+            model.clear();
+        }
+
+        model.addAll(
+                mainChatList.stream()
+                        .filter(c -> c.chatId < 0)
+                        .map(chat -> {
+                            TdApi.Chat received = chats.get(chat.chatId);
+                            synchronized (received) {
+                                return new SwingChat(received);
+                            }
+                        }).collect(Collectors.toList()));
+    }
+
     public static void main(String[] args) throws InterruptedException {
+
+        JFrame frame = new JFrame("TgForm");
+        frame.setContentPane(new Example().panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+
         // disable TDLib log
         Client.execute(new TdApi.SetLogVerbosityLevel(0));
         if (Client.execute(new TdApi.SetLogStream(new TdApi.LogStreamFile("tdlib.log", 1 << 27, false))) instanceof TdApi.Error) {
@@ -326,6 +547,8 @@ public final class Example {
 
         // test Client.execute
         defaultHandler.onResult(Client.execute(new TdApi.GetTextEntities("@telegram /test_command https://telegram.org telegram.me @gif @test")));
+
+//        initUI();
 
         // main loop
         while (!needQuit) {
@@ -378,9 +601,135 @@ public final class Example {
 
     private static class DefaultHandler implements Client.ResultHandler {
 
+        WebsiteLinksRetriever linksRetriever = new WebsiteLinksRetriever();
+        ImperativeVerbsRetriever verbsRetriever = new ImperativeVerbsRetriever();
+
         @Override
         public void onResult(TdApi.Object object) {
-            print(object.toString());
+
+            if (object instanceof TdApi.Messages) {
+                Arrays.stream(((TdApi.Messages) object).messages)
+                        .map(message -> {
+                            EnumSet<Flag> emptyFlags = EnumSet.noneOf(Flag.class);
+                            var linkFlags = linksRetriever.apply(message, emptyFlags);
+                            var verbsFlags = verbsRetriever.apply(message, linkFlags);
+                            return new FlaggedMessage(verbsFlags, message);
+                        })
+                        .forEach(m -> print(m.toString()));
+            } else {
+                print(object.toString());
+            }
+
+//            try {
+//                if (object instanceof TdApi.Messages) {
+//                    TdApi.Message message = ((TdApi.Messages) object).messages[0];
+//                    if (message instanceof TdApi.Message) {
+//                        TdApi.MessageContent content = message.content;
+//
+//                        if (content instanceof TdApi.MessagePhoto) {
+//                            TdApi.FormattedText caption = ((TdApi.MessagePhoto) content).caption;
+//                            if (caption instanceof TdApi.FormattedText) {
+//                                EnumSet<Flag> result = retriever.apply(caption, EnumSet.noneOf(Flag.class));
+//                                print(object.toString() + "/n" + result.toString());
+//                            }
+//                        } else if (content instanceof TdApi.MessageAnimation) {
+//                            TdApi.FormattedText caption = ((TdApi.MessageAnimation) content).caption;
+//                            if (caption instanceof TdApi.FormattedText) {
+//                                EnumSet<Flag> result = retriever.apply(caption, EnumSet.noneOf(Flag.class));
+//                                print(object.toString() + "/n" + result.toString());
+//                            }
+//                        } else {
+//                            print(object.toString());
+//                        }
+//                    } else {
+//                        print(object.toString());
+//                    }
+//                }
+//            } catch (RuntimeException e) {
+//                print(e.getMessage());
+//            }
+
+        }
+    }
+
+//    private static class RetrieverHandler extends DefaultHandler implements Client.ResultHandler {
+//
+//        private Retriever retriever;
+//
+//        public RetrieverHandler(Retriever retriever) {
+//            this.retriever = retriever;
+//        }
+//
+//        @Override
+//        public void onResult(TdApi.Object object) {
+//            String result = "";
+//
+//            if (object instanceof TdApi.Message) {
+//                retriever.load((TdApi.Message) object);
+//            } else {
+//                super.onResult(object);
+//                return;
+//            }
+//
+//            print(result);
+//        }
+//    }
+
+    private static class SwingUIHandler implements Client.ResultHandler, TgTextContentRetrievable {
+
+        private JTextArea viewer;
+
+        private WebsiteLinksRetriever linksRetriever = new WebsiteLinksRetriever();
+        private ImperativeVerbsRetriever verbsRetriever = new ImperativeVerbsRetriever();
+
+        public SwingUIHandler(JTextArea textArea) {
+            this.viewer = textArea;
+        }
+
+        @Override
+        public void onResult(TdApi.Object object) {
+            if (object instanceof TdApi.Messages) {
+                StringBuilder builder = new StringBuilder();
+                Stream<FlaggedMessage> flaggedMessageStream;
+                if (adFilterIsOn) {
+                    flaggedMessageStream = Arrays.stream(((TdApi.Messages) object).messages)
+                            .map(message -> {
+                                EnumSet<Flag> emptyFlags = EnumSet.noneOf(Flag.class);
+                                var linkFlags = linksRetriever.apply(message, emptyFlags);
+                                var verbsFlags = verbsRetriever.apply(message, linkFlags);
+                                logger.log(Level.INFO, "закончил обработку");
+                                logger.log(Level.INFO, verbsFlags.toString());
+                                return new FlaggedMessage(verbsFlags, message);
+                            });
+//                            .filter(m -> !m.getFlags().containsAll(
+//                                    EnumSet.of(Flag.MULTIPLE_CHANNEL_LINKS, Flag.TRIGGER_ACTION)
+//                            ));
+                } else {
+                    flaggedMessageStream = Arrays.stream(((TdApi.Messages) object).messages).
+                            map(m -> new FlaggedMessage(EnumSet.noneOf(Flag.class), m));
+                }
+
+                flaggedMessageStream.forEach(m -> {
+                    Date date = new Date((long) m.getMessage().date * 1000);
+
+                    if (m.getFlags().containsAll(EnumSet.of(Flag.MULTIPLE_CHANNEL_LINKS, Flag.TRIGGER_ACTION))) {
+                        builder.append("!!! РЕКЛАМА !!!");
+                    }
+
+                    if (m.getFlags().containsAll(EnumSet.of(Flag.TRIGGER_ACTION, Flag.SINGLE_CHANNEL_LINK))) {
+                        builder.append("!!! РЕКЛАМА !!!");
+                    }
+                    builder
+                            .append("\n")
+                            .append(date)
+                            .append("\n")
+                            .append(retrieve(m.getMessage()).text)
+                            .append("\n")
+                            .append("–––––––––––––––––––––––––")
+                            .append("\n");
+                });
+                viewer.setText(builder.toString());
+            }
         }
     }
 

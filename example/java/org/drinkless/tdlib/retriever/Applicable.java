@@ -6,4 +6,5 @@ import java.util.EnumSet;
 
 public interface Applicable {
     EnumSet<Flag> apply(TdApi.FormattedText text, EnumSet<Flag> existingFlags);
+    EnumSet<Flag> apply(TdApi.Message message, EnumSet<Flag> flags);
 }
