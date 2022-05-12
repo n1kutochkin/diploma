@@ -10,8 +10,7 @@ import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 import org.drinkless.tdlib.retriever.Flag;
 import org.drinkless.tdlib.retriever.TgTextContentRetrievable;
-import org.drinkless.tdlib.retriever.algorithms.ImperativeVerbsRetriever;
-import org.drinkless.tdlib.retriever.algorithms.WebsiteLinksRetriever;
+import org.drinkless.tdlib.retriever.algorithms.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,9 +38,9 @@ import javax.swing.event.ListSelectionListener;
 /**
  * Example class for TDLib usage from Java.
  */
-public final class Example {
+public final class Application {
     private static Client client = null;
-    private static final Logger logger = Logger.getLogger(String.valueOf(Example.class));
+    private static final Logger logger = Logger.getLogger(String.valueOf(Application.class));
 
     private static TdApi.AuthorizationState authorizationState = null;
     private static volatile boolean haveAuthorization = false;
@@ -76,11 +75,11 @@ public final class Example {
     private static Integer quantityOfChats = 10;
     private static volatile boolean adFilterIsOn = false;
 
-    private JTextField textField1;
+    private JTextField filterTextBox;
     private JRadioButton radioButton;
-    private JComboBox comboBox1;
-    private JButton button1;
-    private JList list1;
+    private JComboBox quantityOfMessagesComboBox;
+    private JButton updateButton;
+    private JList chatListPane;
     private JPanel panel;
     private JScrollPane chatsPane;
     private JScrollPane viewerPane;
@@ -94,15 +93,15 @@ public final class Example {
         }
     }
 
-    public Example() {
+    public Application() {
         model = new DefaultListModel<>();
 
-        list1 = new JList();
-        list1.setModel(model);
+        chatListPane = new JList();
+        chatListPane.setModel(model);
 
-        chatsPane.setViewportView(list1);
+        chatsPane.setViewportView(chatListPane);
 
-        button1.addActionListener(new ActionListener() {
+        updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 getSwingChatList(quantityOfChats);
@@ -110,8 +109,8 @@ public final class Example {
         });
         Integer quantity[] = {10, 20, 50};
 
-        comboBox1 = new JComboBox(quantity);
-        comboBox1.addActionListener(new ActionListener() {
+        quantityOfMessagesComboBox = new JComboBox(quantity);
+        quantityOfMessagesComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox source = (JComboBox)e.getSource();
@@ -126,7 +125,7 @@ public final class Example {
             }
         });
 
-        list1.addListSelectionListener(new ListSelectionListener() {
+        chatListPane.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
@@ -181,9 +180,9 @@ public final class Example {
 
     private static void onAuthorizationStateUpdated(TdApi.AuthorizationState authorizationState) {
         if (authorizationState != null) {
-            Example.authorizationState = authorizationState;
+            Application.authorizationState = authorizationState;
         }
-        switch (Example.authorizationState.getConstructor()) {
+        switch (Application.authorizationState.getConstructor()) {
             case TdApi.AuthorizationStateWaitTdlibParameters.CONSTRUCTOR:
                 TdApi.TdlibParameters parameters = new TdApi.TdlibParameters();
                 parameters.databaseDirectory = "tdlib";
@@ -207,7 +206,7 @@ public final class Example {
                 break;
             }
             case TdApi.AuthorizationStateWaitOtherDeviceConfirmation.CONSTRUCTOR: {
-                String link = ((TdApi.AuthorizationStateWaitOtherDeviceConfirmation) Example.authorizationState).link;
+                String link = ((TdApi.AuthorizationStateWaitOtherDeviceConfirmation) Application.authorizationState).link;
                 System.out.println("Please confirm this login link on another device: " + link);
                 break;
             }
@@ -253,7 +252,7 @@ public final class Example {
                 }
                 break;
             default:
-                System.err.println("Unsupported authorization state:" + newLine + Example.authorizationState);
+                System.err.println("Unsupported authorization state:" + newLine + Application.authorizationState);
         }
     }
 
@@ -531,7 +530,7 @@ public final class Example {
     public static void main(String[] args) throws InterruptedException {
 
         JFrame frame = new JFrame("TgForm");
-        frame.setContentPane(new Example().panel);
+        frame.setContentPane(new Application().panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
@@ -601,24 +600,30 @@ public final class Example {
 
     private static class DefaultHandler implements Client.ResultHandler {
 
-        WebsiteLinksRetriever linksRetriever = new WebsiteLinksRetriever();
-        ImperativeVerbsRetriever verbsRetriever = new ImperativeVerbsRetriever();
+//        WebsiteLinksRetriever linksRetriever = new WebsiteLinksRetriever();
+//        ImperativeVerbsRetriever verbsRetriever = new ImperativeVerbsRetriever();
+//
+//        AdvertisementObjectsRetriever advertisementObjectsRetriever = new AdvertisementObjectsRetriever();
+//
+//        TriggerWordsRetriever triggerWordsRetriever = new TriggerWordsRetriever();
+//
+//        TriggerHashTagRetriever triggerHashTagRetriever = new TriggerHashTagRetriever();
 
         @Override
         public void onResult(TdApi.Object object) {
 
-            if (object instanceof TdApi.Messages) {
-                Arrays.stream(((TdApi.Messages) object).messages)
-                        .map(message -> {
-                            EnumSet<Flag> emptyFlags = EnumSet.noneOf(Flag.class);
-                            var linkFlags = linksRetriever.apply(message, emptyFlags);
-                            var verbsFlags = verbsRetriever.apply(message, linkFlags);
-                            return new FlaggedMessage(verbsFlags, message);
-                        })
-                        .forEach(m -> print(m.toString()));
-            } else {
+//            if (object instanceof TdApi.Messages) {
+//                Arrays.stream(((TdApi.Messages) object).messages)
+//                        .map(message -> {
+//                            EnumSet<Flag> emptyFlags = EnumSet.noneOf(Flag.class);
+//                            var linkFlags = linksRetriever.apply(message, emptyFlags);
+//                            var verbsFlags = verbsRetriever.apply(message, linkFlags);
+//                            return new FlaggedMessage(verbsFlags, message);
+//                        })
+//                        .forEach(m -> print(m.toString()));
+//            } else {
                 print(object.toString());
-            }
+//            }
 
 //            try {
 //                if (object instanceof TdApi.Messages) {
@@ -681,6 +686,12 @@ public final class Example {
 
         private WebsiteLinksRetriever linksRetriever = new WebsiteLinksRetriever();
         private ImperativeVerbsRetriever verbsRetriever = new ImperativeVerbsRetriever();
+
+        private AdvertisementObjectsRetriever advertisementObjectsRetriever = new AdvertisementObjectsRetriever();
+
+        private TriggerWordsRetriever triggerWordsRetriever = new TriggerWordsRetriever();
+
+        private TriggerHashTagRetriever triggerHashTagRetriever = new TriggerHashTagRetriever();
 
         public SwingUIHandler(JTextArea textArea) {
             this.viewer = textArea;

@@ -39,20 +39,14 @@ public class WebsiteLinksRetriever extends Retriever implements Applicable, TgTe
         HashMap<String, Long> pairs = new HashMap<>();
 
         uniqueUrls.forEach(url ->
-            pairs.put(
-                    url, urls.stream().filter(s -> s.equals(url)).count()
-            )
+                pairs.put(
+                        url, urls.stream().filter(s -> s.equals(url)).count()
+                )
         );
 
         Set<String> tgUrls = uniqueUrls.stream().filter(url -> url.contains(TELEGRAM_DOMAIN)).collect(Collectors.toSet());
 
-        tgUrls.forEach(url -> {
-            if (pairs.get(url) > 1) {
-                newFlags.add(Flag.MULTIPLE_CHANNEL_LINKS);
-            } else {
-                newFlags.add(Flag.SINGLE_CHANNEL_LINK);
-            }
-        });
+        tgUrls.forEach(url -> newFlags.add(pairs.get(url) > 1 ? Flag.MULTIPLE_CHANNEL_LINKS : Flag.SINGLE_CHANNEL_LINK));
 
         uniqueUrls.removeAll(tgUrls);
 
