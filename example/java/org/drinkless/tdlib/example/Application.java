@@ -136,7 +136,7 @@ public final class Application {
                                     id,
                                     FROM_LAST_MESSAGE,
                                     -1,
-                                    20,
+                                    100,
                                     false
                             ),
                             new SwingUIHandler(viewerArea)
@@ -723,6 +723,9 @@ public final class Application {
                 flaggedMessageStream.forEach(m -> {
                     Date date = new Date((long) m.getMessage().date * 1000);
 
+                    builder.append(">>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    builder.append("\n");
+
                     if (m.getFlags().containsAll(EnumSet.of(Flag.MULTIPLE_CHANNEL_LINKS, Flag.TRIGGER_ACTION))) {
                         builder.append("!!! РЕКЛАМА !!!");
                     }
@@ -736,7 +739,7 @@ public final class Application {
                             .append("\n")
                             .append(retrieve(m.getMessage()).text)
                             .append("\n")
-                            .append("–––––––––––––––––––––––––")
+                            .append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
                             .append("\n");
                 });
                 viewer.setText(builder.toString());
