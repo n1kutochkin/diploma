@@ -62,7 +62,7 @@
       </component>
       <component id="14e3b" class="javax.swing.JLabel">
         <constraints>
-          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+          <grid row="1" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="313" height="29"/>
           </grid>
         </constraints>
@@ -70,26 +70,27 @@
           <text value="Введите выражение для поиска по всем каналам"/>
         </properties>
       </component>
+      <component id="31ea9" class="javax.swing.JTextField" binding="filterTextBox">
+        <constraints>
+          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-1"/>
+          <horizontalAlignment value="2"/>
+          <opaque value="true"/>
+          <toolTipText value=""/>
+        </properties>
+      </component>
       <component id="215a3" class="javax.swing.JButton" binding="искатьButton" default-binding="true">
         <constraints>
-          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="78" height="29"/>
           </grid>
         </constraints>
         <properties>
           <text value="Искать"/>
-        </properties>
-      </component>
-      <component id="31ea9" class="javax.swing.JTextField" binding="filterTextBox">
-        <constraints>
-          <grid row="2" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
-          </grid>
-        </constraints>
-        <properties>
-          <horizontalAlignment value="2"/>
-          <opaque value="true"/>
-          <toolTipText value="Вводить сюда..."/>
         </properties>
       </component>
     </children>
