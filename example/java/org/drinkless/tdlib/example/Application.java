@@ -84,6 +84,7 @@ public final class Application {
     private JScrollPane chatsPane;
     private JScrollPane viewerPane;
     private JTextArea viewerArea;
+    private JButton искатьButton;
 
     static {
         try {
