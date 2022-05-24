@@ -6,7 +6,9 @@
       <xy x="20" y="20" width="844" height="479"/>
     </constraints>
     <properties/>
-    <border type="none"/>
+    <border type="line">
+      <color color="-9934744"/>
+    </border>
     <children>
       <component id="f937a" class="javax.swing.JRadioButton" binding="radioButton">
         <constraints>
@@ -84,7 +86,11 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <horizontalAlignment value="2"/>
+          <opaque value="true"/>
+          <toolTipText value="Вводить сюда..."/>
+        </properties>
       </component>
     </children>
   </grid>
