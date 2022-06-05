@@ -1,0 +1,135 @@
+<mxfile host="app.diagrams.net" modified="2022-06-04T16:18:28.810Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36" etag="ooRMmNzq9t1ZxhV5OGah" version="18.1.3" type="github">
+  <diagram id="A6LIthpbxhNIBf95pqul" name="Page-1">
+    <mxGraphModel dx="1554" dy="969" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="_C51SMab4XghRrtfBPDF-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-1" target="_C51SMab4XghRrtfBPDF-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-4" value="&quot;(&quot;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-3">
+          <mxGeometry x="-0.05" y="4" relative="1" as="geometry">
+            <mxPoint y="-16" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-1" target="_C51SMab4XghRrtfBPDF-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-8" value="[a-zA-Zа-яА-я]" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-7">
+          <mxGeometry x="-0.275" y="2" relative="1" as="geometry">
+            <mxPoint x="-2" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-1" value="0" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="120" y="250" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-11" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-2" target="_C51SMab4XghRrtfBPDF-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-2" value="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="250" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-13" value="" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-6" target="_C51SMab4XghRrtfBPDF-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-14" value="&quot;&amp;amp;&quot;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-13">
+          <mxGeometry x="-0.075" y="4" relative="1" as="geometry">
+            <mxPoint x="-4" y="3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-16" value="" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-6" target="_C51SMab4XghRrtfBPDF-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-17" value="&quot;|&quot;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-16">
+          <mxGeometry x="-0.075" y="-1" relative="1" as="geometry">
+            <mxPoint x="3" y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-6" value="2" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="120" y="410" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-12" target="_C51SMab4XghRrtfBPDF-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-12" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="120" y="570" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-23" value="" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-15" target="_C51SMab4XghRrtfBPDF-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-24" value="[a-zA-Zа-яА-я]" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-23">
+          <mxGeometry x="-0.05" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-15" value="4" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="410" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-26" value="" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-22" target="_C51SMab4XghRrtfBPDF-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-29" value="&quot;)&quot;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-26">
+          <mxGeometry x="-0.1" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-22" value="5" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="570" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-33" value="" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-25" target="_C51SMab4XghRrtfBPDF-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-34" value="&quot;&amp;amp;&quot;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-33">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-36" value="" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-25" target="_C51SMab4XghRrtfBPDF-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-37" value="&quot;|&quot;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-36">
+          <mxGeometry x="-0.05" y="1" relative="1" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-42" value="" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-25" target="_C51SMab4XghRrtfBPDF-41">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="770" />
+              <mxPoint x="400" y="930" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-43" value="e" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=20;" vertex="1" connectable="0" parent="_C51SMab4XghRrtfBPDF-42">
+          <mxGeometry x="-0.048" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-25" value="6" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="730" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-39" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-32" target="_C51SMab4XghRrtfBPDF-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-32" value="7" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="440" y="730" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-38" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=20;" edge="1" parent="1" source="_C51SMab4XghRrtfBPDF-35" target="_C51SMab4XghRrtfBPDF-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="50" y="930" />
+              <mxPoint x="50" y="230" />
+              <mxPoint x="160" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-35" value="8" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="890" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_C51SMab4XghRrtfBPDF-41" value="9" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="450" y="890" width="80" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

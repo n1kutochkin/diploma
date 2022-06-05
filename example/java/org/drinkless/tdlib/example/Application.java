@@ -443,7 +443,7 @@ public final class Application {
                                     id,
                                     FROM_LAST_MESSAGE,
                                     OFFSET_FOR_LAST_MESSAGE,
-                                    20,
+                                    10,
                                     false
                             ),
                             new SwingUIHandler(viewer)
@@ -530,7 +530,7 @@ public final class Application {
 
     public static void main(String[] args) throws InterruptedException {
 
-        JFrame frame = new JFrame("TgForm");
+        JFrame frame = new JFrame("Система агрегации и фильтрации сообщений Telegram");
         frame.setContentPane(new Application().panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
