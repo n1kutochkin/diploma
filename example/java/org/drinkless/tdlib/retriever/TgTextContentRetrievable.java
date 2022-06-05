@@ -15,7 +15,7 @@ public interface TgTextContentRetrievable {
         } else if (content instanceof TdApi.MessageVideo) {
             return  ((TdApi.MessageVideo) content).caption;
         } else {
-            throw new RuntimeException("Несовместимый тип сообщений");
+            return null;
         }
     }
 }

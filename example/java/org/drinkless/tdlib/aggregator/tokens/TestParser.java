@@ -1,7 +1,9 @@
 package org.drinkless.tdlib.aggregator.tokens;
 
+import org.drinkless.tdlib.aggregator.BinaryTreePrinter;
 import org.drinkless.tdlib.aggregator.Lexer;
 import org.drinkless.tdlib.aggregator.Parser;
+import org.drinkless.tdlib.aggregator.TreeHelper;
 
 public class TestParser {
     public static void main(String[] args) {
@@ -14,5 +16,10 @@ public class TestParser {
         var allTokens = lexer.getAllTokens();
         var parser = new Parser(allTokens);
         var result = parser.parse();
+        var printer = new BinaryTreePrinter(result);
+        printer.print();
+        System.out.println();
+        var helper = new TreeHelper();
+        helper.traversePostOrder(result);
     }
 }

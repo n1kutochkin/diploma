@@ -36,7 +36,9 @@ public class Parser {
         var x = X();
         if (currentToken instanceof Or) {
             var buff = currentToken;
-            next();
+            if (iterator.hasNext()) {
+                next();
+            }
             var s = S();
             return new Node<>(buff, x, s); //TODO
         } else {
@@ -49,7 +51,9 @@ public class Parser {
 
         if (currentToken instanceof And) {
             var buff = currentToken;
-            next();
+            if (iterator.hasNext()) {
+                next();
+            }
             var x = X();
             return new Node<>(buff, v, x); //TODO
         } else {
@@ -61,10 +65,14 @@ public class Parser {
     private Node<Token> V() {
         if (currentToken instanceof Word) {
             var buff = currentToken;
-            next();
+            if (iterator.hasNext()) {
+                next();
+            }
             return new Node<>(buff, null, null); // TODO: 05.06.2022
         } else if (currentToken instanceof OpenBracket) {
-            next();
+            if (iterator.hasNext()) {
+                next();
+            }
             var s = S();
             if (!(currentToken instanceof CloseBracket)) {
                 throw new RuntimeException();

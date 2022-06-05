@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ImperativeVerbsRetriever extends TextRetriever implements Applicable, TgTextContentRetrievable {
+public class ImperativeVerbsRetriever extends TextRetriever {
 
     public static final String PUNCT_REGEX = "[-?,!:—]";
     public static final String RUSSIAN_WORD = "([а-я]+)|([a-я]+-[а-я])";
@@ -37,12 +37,15 @@ public class ImperativeVerbsRetriever extends TextRetriever implements Applicabl
         parser = new GParserImpl();
     }
 
-    public ImperativeVerbsRetriever(EnumSet<Flag> flags) {
-        super(flags);
+    public ImperativeVerbsRetriever(EnumSet<Flag> flags, TdApi.FormattedText text) {
+        super(flags, text);
+    }
+
+    public ImperativeVerbsRetriever(EnumSet<Flag> flags, TdApi.Message message) {
+        super(flags, message);
     }
 
     public ImperativeVerbsRetriever() {
-        super();
     }
 
     public static Set<String> normalizedString(String data) {

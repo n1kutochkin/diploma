@@ -7,20 +7,20 @@ import java.util.EnumSet;
 
 public class FlaggedMessage {
 
-    public FlaggedMessage(EnumSet<Flag> flags, TdApi.Message message) {
+    public FlaggedMessage(EnumSet<Flag> flags, String message) {
         this.flags = flags;
         this.message = message;
     }
 
     private EnumSet<Flag> flags;
-    private TdApi.Message message;
+    private String message;
 
 
-    public TdApi.Message getMessage() {
+    public String getMessage() {
         return message;
     }
 
-    public void setMessage(TdApi.Message message) {
+    public void setMessage(String message) {
         this.message = message;
     }
 

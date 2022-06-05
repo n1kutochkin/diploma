@@ -5,7 +5,7 @@ import org.drinkless.tdlib.retriever.algorithms.ImperativeVerbsRetriever;
 
 import java.util.EnumSet;
 
-public class TriggerRetrieverTest extends Test {
+public class TriggerRetrieverTest {
 
     public static void main(String[] args) {
         ImperativeVerbsRetriever retriever = new ImperativeVerbsRetriever();

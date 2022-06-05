@@ -9,18 +9,20 @@ import org.drinkless.tdlib.retriever.TgTextContentRetrievable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class WebsiteLinksRetriever extends Retriever implements Applicable, TgTextContentRetrievable {
+public class WebsiteLinksRetriever extends Retriever {
 
     private static final String TELEGRAM_DOMAIN = "t.me";
 
-    public WebsiteLinksRetriever(EnumSet<Flag> flags) {
-        super(flags);
+    public WebsiteLinksRetriever(EnumSet<Flag> flags, TdApi.FormattedText text) {
+        super(flags, text);
+    }
+
+    public WebsiteLinksRetriever(EnumSet<Flag> flags, TdApi.Message message) {
+        super(flags, message);
     }
 
     public WebsiteLinksRetriever() {
-        super();
     }
-
 
     @Override
     public EnumSet<Flag> apply(TdApi.FormattedText content, EnumSet<Flag> existingFlags) {

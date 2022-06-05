@@ -8,7 +8,10 @@ package org.drinkless.tdlib.example;
 
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
+import org.drinkless.tdlib.aggregator.RegexAggregator;
 import org.drinkless.tdlib.retriever.Flag;
+import org.drinkless.tdlib.retriever.Retriever;
+import org.drinkless.tdlib.retriever.TextRetriever;
 import org.drinkless.tdlib.retriever.TgTextContentRetrievable;
 import org.drinkless.tdlib.retriever.algorithms.*;
 
@@ -21,8 +24,7 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -30,6 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.lang.Thread.sleep;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -42,6 +46,7 @@ public final class Application {
     private static Client client = null;
     private static final Logger logger = Logger.getLogger(String.valueOf(Application.class));
 
+    private static final TextRetriever tr = new TextRetriever();
     private static TdApi.AuthorizationState authorizationState = null;
     private static volatile boolean haveAuthorization = false;
     private static volatile boolean needQuit = false;
@@ -70,7 +75,9 @@ public final class Application {
     private static final long FROM_LAST_MESSAGE = 0;
     private static final int OFFSET_FOR_LAST_MESSAGE = 0;
     private static volatile String currentPrompt = null;
+    private static final String IN_ALL_CHATS = null;
 
+    private static String query;
     private static DefaultListModel<SwingChat> model;
     private static Integer quantityOfChats = 10;
     private static volatile boolean adFilterIsOn = false;
@@ -89,6 +96,7 @@ public final class Application {
     static {
         try {
             System.loadLibrary("tdjni");
+
         } catch (UnsatisfiedLinkError e) {
             e.printStackTrace();
         }
@@ -143,6 +151,36 @@ public final class Application {
                             new SwingUIHandler(viewerArea)
                     );
                 }
+            }
+        });
+        искатьButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                var aggregator = new RegexAggregator(query, new SwingUIHandler(viewerArea), client);
+
+                aggregator.aggregate();
+
+                client.send(
+                        new TdApi.SearchMessages(
+                                null,
+                                query,
+                                0,
+                                0,
+                                0,
+                                20,
+                                null,
+                                0,
+                                0
+                        ),
+                        new SwingUIHandler(viewerArea)
+                );
+            }
+        });
+        filterTextBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                query = filterTextBox.getText();
             }
         });
     }
@@ -680,19 +718,29 @@ public final class Application {
 //            print(result);
 //        }
 //    }
-
     private static class SwingUIHandler implements Client.ResultHandler, TgTextContentRetrievable {
 
         private JTextArea viewer;
 
-        private WebsiteLinksRetriever linksRetriever = new WebsiteLinksRetriever();
-        private ImperativeVerbsRetriever verbsRetriever = new ImperativeVerbsRetriever();
+        private Set<EnumSet<Flag>> filters = Set.of(
+                EnumSet.of(Flag.TRIGGER_ACTION, Flag.MULTIPLE_CHANNEL_LINKS),
+                EnumSet.of(Flag.TRIGGER_ACTION, Flag.SINGLE_CHANNEL_LINK),
+                EnumSet.of(Flag.ACTION, Flag.SINGLE_CHANNEL_LINK),
+                EnumSet.of(Flag.ACTION, Flag.MULTIPLE_CHANNEL_LINKS),
+                EnumSet.of(Flag.FREQUENTLY_ADVERTISED, Flag.TRIGGER_WORD),
+                EnumSet.of(Flag.FREQUENTLY_ADVERTISED)
+        );
 
-        private AdvertisementObjectsRetriever advertisementObjectsRetriever = new AdvertisementObjectsRetriever();
+        private ExecutorService threadPool = Executors.newFixedThreadPool(5);
 
-        private TriggerWordsRetriever triggerWordsRetriever = new TriggerWordsRetriever();
+//        private WebsiteLinksRetriever linksRetriever = new WebsiteLinksRetriever();
+//        private ImperativeVerbsRetriever verbsRetriever = new ImperativeVerbsRetriever();
+//
+//        private AdvertisementObjectsRetriever advertisementObjectsRetriever = new AdvertisementObjectsRetriever();
 
-        private TriggerHashTagRetriever triggerHashTagRetriever = new TriggerHashTagRetriever();
+//        private TriggerWordsRetriever triggerWordsRetriever = new TriggerWordsRetriever();
+
+//        private TriggerHashTagRetriever triggerHashTagRetriever = new TriggerHashTagRetriever();
 
         public SwingUIHandler(JTextArea textArea) {
             this.viewer = textArea;
@@ -700,50 +748,113 @@ public final class Application {
 
         @Override
         public void onResult(TdApi.Object object) {
-            if (object instanceof TdApi.Messages) {
-                StringBuilder builder = new StringBuilder();
-                Stream<FlaggedMessage> flaggedMessageStream;
-                if (adFilterIsOn) {
-                    flaggedMessageStream = Arrays.stream(((TdApi.Messages) object).messages)
-                            .map(message -> {
-                                EnumSet<Flag> emptyFlags = EnumSet.noneOf(Flag.class);
-                                var linkFlags = linksRetriever.apply(message, emptyFlags);
-                                var verbsFlags = verbsRetriever.apply(message, linkFlags);
-                                logger.log(Level.INFO, "закончил обработку");
-                                logger.log(Level.INFO, verbsFlags.toString());
-                                return new FlaggedMessage(verbsFlags, message);
-                            });
+            try {
+                if (object instanceof TdApi.Messages) {
+                    StringBuilder builder = new StringBuilder();
+                    Stream<FlaggedMessage> flaggedMessageStream;
+                    if (adFilterIsOn) {
+                        int length = ((TdApi.Messages) object).messages.length;
+                        TdApi.Message[] receivedMessages = Arrays.copyOf(((TdApi.Messages) object).messages, length);
+
+                        flaggedMessageStream = Arrays.stream(receivedMessages)
+                                .map(message -> {
+
+                                    EnumSet<Flag> emptyFlags = EnumSet.noneOf(Flag.class);
+
+                                    List<Retriever> retrievers = List.of(
+                                            new WebsiteLinksRetriever(emptyFlags, message),
+                                            new ImperativeVerbsRetriever(emptyFlags, message),
+                                            new AdvertisementObjectsRetriever(emptyFlags, message),
+                                            new TriggerHashTagRetriever(emptyFlags, message),
+                                            new TriggerWordsRetriever(emptyFlags, message)
+                                    );
+
+                                    List<Future<EnumSet<Flag>>> futures;
+
+                                    try {
+                                        futures = threadPool.invokeAll(retrievers);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
+                                    EnumSet<Flag> result = EnumSet.noneOf(Flag.class);
+
+                                    futures.stream()
+                                            .forEach(t -> {
+                                                try {
+                                                    result.addAll(t.get());
+                                                } catch (InterruptedException e) {
+                                                    logger.log(Level.SEVERE, e.getMessage());
+                                                } catch (ExecutionException e) {
+                                                    logger.log(Level.SEVERE, e.getMessage());
+                                                } catch (Throwable e) {
+                                                    logger.log(Level.SEVERE, e.getMessage());
+                                                }
+                                            });
+
+//                                retrievers.stream()
+//                                        .map(Retriever::getFlags)
+//                                        .forEach(s -> result.addAll(s));
+
+                                    return new FlaggedMessage(result, Optional.ofNullable(retrieve(message)).map(t -> t.text).orElse(""));
+
+//                                var linkFlags = linksRetriever.apply(message, emptyFlags);
+//                                var verbsFlags = verbsRetriever.apply(message, linkFlags);
+//                                logger.log(Level.INFO, "закончил обработку");
+//                                logger.log(Level.INFO, verbsFlags.toString());
+//                                return new FlaggedMessage(verbsFlags, message);
+                                });
 //                            .filter(m -> !m.getFlags().containsAll(
 //                                    EnumSet.of(Flag.MULTIPLE_CHANNEL_LINKS, Flag.TRIGGER_ACTION)
 //                            ));
-                } else {
-                    flaggedMessageStream = Arrays.stream(((TdApi.Messages) object).messages).
-                            map(m -> new FlaggedMessage(EnumSet.noneOf(Flag.class), m));
+                    } else {
+                        flaggedMessageStream = Arrays.stream(((TdApi.Messages) object).messages).
+                                map(m -> new FlaggedMessage(EnumSet.noneOf(Flag.class), Optional.ofNullable(retrieve(m)).map(t -> t.text).orElse("")));
+                    }
+
+                    flaggedMessageStream.forEach(m -> {
+//                    Date date = new Date((long) m.getMessage().date * 1000);
+
+                        builder.append(">>>>>>>>>>>>>>>>>>>>>>>>>>");
+                        builder.append("\n");
+
+//                    switch (m.getFlags()) {
+//                        case EnumSet e && e.containsAll(EnumSet.of(Flag.MULTIPLE_CHANNEL_LINKS, Flag.TRIGGER_ACTION)) -> builder.append("!!! РЕКЛАМА !!!");
+//                        default -> logger.log(Level.INFO, "NOT AN AD");
+//                    }
+
+//                        if (m.getFlags().containsAll(EnumSet.of(Flag.MULTIPLE_CHANNEL_LINKS, Flag.TRIGGER_ACTION))) {
+//                            builder.append("!!! РЕКЛАМА !!!");
+//                        }
+//
+//                        if (m.getFlags().containsAll(EnumSet.of(Flag.TRIGGER_ACTION, Flag.SINGLE_CHANNEL_LINK))) {
+//                            builder.append("!!! РЕКЛАМА !!!");
+//                        }
+
+                        for (EnumSet<Flag> f : filters) {
+                            if (m.getFlags().containsAll(f)) {
+                                builder.append("!!!!!!!!!!!! 🔥🔥🔥РЕКЛАМА🔥🔥🔥 !!!!!!!!!!!!");
+                                break;
+                            }
+                        }
+
+                        builder
+                                .append("\n")
+//                            .append(date)
+                                .append("\n")
+//                            .append(retrieve(m.getMessage()).text)
+                                .append(m.getMessage())
+                                .append("\n")
+                                .append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+                                .append("\n");
+                    });
+
+                    String s = builder.toString();
+
+                    viewer.setText(builder.toString());
                 }
-
-                flaggedMessageStream.forEach(m -> {
-                    Date date = new Date((long) m.getMessage().date * 1000);
-
-                    builder.append(">>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    builder.append("\n");
-
-                    if (m.getFlags().containsAll(EnumSet.of(Flag.MULTIPLE_CHANNEL_LINKS, Flag.TRIGGER_ACTION))) {
-                        builder.append("!!! РЕКЛАМА !!!");
-                    }
-
-                    if (m.getFlags().containsAll(EnumSet.of(Flag.TRIGGER_ACTION, Flag.SINGLE_CHANNEL_LINK))) {
-                        builder.append("!!! РЕКЛАМА !!!");
-                    }
-                    builder
-                            .append("\n")
-                            .append(date)
-                            .append("\n")
-                            .append(retrieve(m.getMessage()).text)
-                            .append("\n")
-                            .append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-                            .append("\n");
-                });
-                viewer.setText(builder.toString());
+            } catch (Throwable e) {
+                System.out.println(e.getMessage());
             }
         }
     }
